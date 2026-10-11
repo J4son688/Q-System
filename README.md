@@ -54,6 +54,8 @@ app is built separately; see the [deployment guide](DEPLOYMENT.md).
 
 Get the latest version from **[GitHub Releases](https://github.com/nardvyn/PCDS-Queue/releases/latest)**:
 
+**Android:** [Download PCDS Queue Mobile v1.0.0 (APK)](https://github.com/nardvyn/PCDS-Queue/releases/download/v1.0.0/PCDS-Queue-Mobile-v1.0.0.apk) · [View the Expo build](https://expo.dev/accounts/nardvyn/projects/PCDSQueueMobile/builds/1cc2c380-3ded-4a30-b87c-77f8b703e807)
+
 - [Admin installer](https://github.com/nardvyn/PCDS-Queue/releases/download/v1.0.0/PCDS.Queue.Admin.Setup.exe)
 - [Staff installer](https://github.com/nardvyn/PCDS-Queue/releases/download/v1.0.0/PCDS.Queue.Staff.Setup.exe)
 - [Kiosk installer](https://github.com/nardvyn/PCDS-Queue/releases/download/v1.0.0/PCDS.Queue.Kiosk.Setup.exe)
