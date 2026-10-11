@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/nardvyn/PCDS-Queue/main/assets/pcds-college-crest.png" alt="Polytechnic College of Davao del Sur official crest" width="132">
+
 # PCDS Queue
 
 ### Campus Queue Management System
