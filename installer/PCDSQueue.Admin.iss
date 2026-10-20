@@ -1,5 +1,5 @@
 #define MyAppName "PCDS Queue Admin"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "Polytechnic College of Davao del Sur"
 #define MyAppExeName "PCDSQueue.Admin.exe"
 
