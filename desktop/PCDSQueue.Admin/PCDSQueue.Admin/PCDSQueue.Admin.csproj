@@ -6,10 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\pcds-queue.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="QRCoder" Version="1.6.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Resource Include="Assets\pcds-crest.png" />
+    <Resource Include="Assets\pcds-queue.ico" />
+  </ItemGroup>
 </Project>
