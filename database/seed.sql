@@ -32,14 +32,7 @@ ON DUPLICATE KEY UPDATE
     `window_name` = VALUES(`window_name`);
 
 -- ---------------------------------------------------------------------------
--- staff_users — one default admin account (password must be reset before production use)
--- Demo credentials: username = admin, password = admin
--- ---------------------------------------------------------------------------
-INSERT INTO `staff_users` (`username`, `password_hash`, `full_name`, `role`) VALUES
-    ('admin', 'scrypt:32768:8:1$fwfLL5GqDOWsZljf$2165f00c7aff01dc4b1f8a35a75d0fbbcfa44633879cd17f9e796fd83cfed442e85547d4054615b3d1ebb0a441bb43342a19c3e62dc1ec7e9d66bdfe86112d49', 'System Administrator', 'ADMIN')
-ON DUPLICATE KEY UPDATE
-    `full_name` = VALUES(`full_name`);
-
+-- Admin accounts are created separately with backend/create_admin.py.
 -- ---------------------------------------------------------------------------
 -- system_settings
 -- ---------------------------------------------------------------------------

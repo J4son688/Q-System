@@ -19,6 +19,15 @@ class Config:
         elif parsed_database_url.drivername != "mysql+pymysql":
             raise ValueError("MYSQL_URL must use the mysql:// or mysql+pymysql:// scheme.")
         SQLALCHEMY_DATABASE_URI = parsed_database_url.render_as_string(hide_password=False)
+        MYSQL_SSL_CA = os.getenv("MYSQL_SSL_CA")
+        if MYSQL_SSL_CA:
+            SQLALCHEMY_ENGINE_OPTIONS = {
+                "connect_args": {
+                    "ssl_ca": MYSQL_SSL_CA,
+                    "ssl_verify_cert": True,
+                    "ssl_verify_identity": True,
+                }
+            }
     else:
         DB_HOST = os.getenv("DB_HOST", "localhost")
         DB_PORT = os.getenv("DB_PORT", "3306")

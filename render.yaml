@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: pcds-queue-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: Production
+      - key: MYSQL_URL
+        sync: false
+      - key: MYSQL_SSL_CA
+        value: /etc/ssl/certs/ca-certificates.crt
+      - key: JWT_SECRET_KEY
+        generateValue: true
