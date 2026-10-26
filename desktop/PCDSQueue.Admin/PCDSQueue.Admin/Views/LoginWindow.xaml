@@ -1,8 +1,8 @@
 <Window x:Class="PCDSQueue.Admin.Views.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PCDS Queue - Administration"
-        Icon="pack://application:,,,/Assets/pcds-queue.ico"
+        Title=" Queue - Administration"
+
         Width="1050" Height="650" MinWidth="900" MinHeight="580"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}">
@@ -12,16 +12,11 @@
             <ColumnDefinition Width="0.95*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}">
+        <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Grid.ColumnSpan="2" Margin="0,0,468,0">
             <Grid Margin="58">
                 <StackPanel VerticalAlignment="Center">
-                    <Border Width="76" Height="76" Background="White" CornerRadius="38"
-                            HorizontalAlignment="Left" Padding="4">
-                        <Image Source="/Assets/pcds-crest.png" Stretch="Uniform"
-                               RenderOptions.BitmapScalingMode="HighQuality"
-                               AutomationProperties.Name="Polytechnic College of Davao del Sur crest" />
-                    </Border>
-                    <TextBlock Text="PCDS QUEUE" FontSize="30" FontWeight="Bold"
+
+                    <TextBlock Text="QUEUE MANAGEMENT SYSTEM" FontSize="30" FontWeight="Bold"
                                Foreground="White" Margin="0,28,0,0" />
                     <TextBlock Text="ADMINISTRATION" FontSize="13" FontWeight="SemiBold"
                                Foreground="#C8EBED" Margin="0,6,0,0" />
@@ -46,7 +41,7 @@
                 <StackPanel>
                     <TextBlock Text="ADMIN LOGIN" FontSize="27" FontWeight="Bold"
                                Foreground="{StaticResource TextBrush}" />
-                    <TextBlock Text="Sign in to manage the PCDS Queue System"
+                    <TextBlock Text="Sign in to manage the Queue System"
                                Foreground="{StaticResource MutedTextBrush}"
                                FontSize="13" Margin="0,7,0,30" />
 

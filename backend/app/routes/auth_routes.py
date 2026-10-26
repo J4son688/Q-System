@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint,  jsonify, request
 from flask_jwt_extended import (
     create_access_token,
     get_jwt_identity,
@@ -63,6 +63,7 @@ def login():
         return jsonify({
             "message": "Invalid username or password."
         }), 401
+
 
     if user["account_status"] != "ACTIVE":
         return jsonify({
@@ -166,4 +167,3 @@ def me():
             "window_name": user["window_name"]
         }
     }), 200
-

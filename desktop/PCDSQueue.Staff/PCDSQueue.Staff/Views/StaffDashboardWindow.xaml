@@ -1,7 +1,7 @@
 <Window x:Class="PCDSQueue.Staff.Views.StaffDashboardWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PCDS Queue - Staff"
+        Title=" Queue - Staff"
         Width="1280" Height="800" MinWidth="1100" MinHeight="700"
         WindowStartupLocation="CenterScreen" Background="#F5F7FB">
     <Grid>
@@ -10,12 +10,8 @@
             <Grid Margin="28">
                 <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                 <StackPanel>
-                    <Border Width="58" Height="58" HorizontalAlignment="Left" Background="White" CornerRadius="29" Padding="4">
-                        <Image Source="/Assets/pcds-crest.png" Stretch="Uniform"
-                               RenderOptions.BitmapScalingMode="HighQuality"
-                               AutomationProperties.Name="Polytechnic College of Davao del Sur crest" />
-                    </Border>
-                    <TextBlock Text="PCDS QUEUE" Foreground="White" FontWeight="Bold" FontSize="18" Margin="0,17,0,0" />
+
+                    <TextBlock Text="QUEUE" Foreground="White" FontWeight="Bold" FontSize="18" Margin="0,17,0,0" />
                     <TextBlock Text="Staff Console" Foreground="#B4E1E3" FontSize="12" Margin="0,4,0,0" />
                 </StackPanel>
                 <StackPanel Grid.Row="1" Margin="0,65,0,0">

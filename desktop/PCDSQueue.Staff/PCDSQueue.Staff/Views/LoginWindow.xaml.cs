@@ -91,10 +91,12 @@ public partial class LoginWindow : Window
                 throw new Exception("Staff information was not returned.");
             }
 
-            if (!string.Equals(result.User.Role, "STAFF", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(result.User.Role, "STAFF", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(result.User.Role, "ADMIN", StringComparison.OrdinalIgnoreCase))
             {
-                throw new Exception("This account does not have Staff access.");
+                throw new Exception("This account does not have Staff or Admin access.");
             }
+
 
             SessionManager.AccessToken = result.AccessToken;
             SessionManager.CurrentUser = result.User;

@@ -13,9 +13,7 @@
     <PackageReference Include="QRCoder" Version="1.6.0" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <Resource Include="Assets\pcds-crest.png" />
-    <Resource Include="Assets\pcds-queue.ico" />
+    <Folder Include="Assets\" />
   </ItemGroup>
 </Project>

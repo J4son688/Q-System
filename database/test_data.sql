@@ -4,10 +4,11 @@
 USE pcds_queue_db;
 
 -- A few extra staff accounts (Cashier Window 3 operator used in the walkthrough example)
+-- Demo credentials: cashier1/cashier1, registrar1/registrar1, bookstore1/bookstore1
 INSERT INTO `staff_users` (`username`, `password_hash`, `full_name`, `role`) VALUES
-    ('cashier1',   '$argon2id$CHANGE_ME', 'Cashier Window 3 Staff', 'STAFF'),
-    ('registrar1', '$argon2id$CHANGE_ME', 'Registrar Window 1 Staff', 'STAFF'),
-    ('bookstore1', '$argon2id$CHANGE_ME', 'Bookstore Window 1 Staff', 'STAFF')
+    ('cashier1',   'scrypt:32768:8:1$xn17X3E2em45K7xV$6e1c6ae0d4576335a8bf6edc2606af58fdad02d90f3bb7366c7fd435a8a959918dc3ccf5e5cb8c5e7f5a957d78b621b9a9ec3c3fcb5132dbf51be4eaffdbd6a4', 'Cashier Window 3 Staff', 'STAFF'),
+    ('registrar1', 'scrypt:32768:8:1$a5OHAYpD2s09gVfn$bf5b95e21147bfa20f1c44e7a33bdb38614ad799387b16e94e097b126f8ed411e4f5d678d018b1f956a95a1af22f97337605da9a3c9d2eb58218adb57ff7e256', 'Registrar Window 1 Staff', 'STAFF'),
+    ('bookstore1', 'scrypt:32768:8:1$07SpRQPAhx73Uj48$dba8c62cc3b0b0e435f66d4bb71830de73361b9dced41a794a1d26fd5ab68cb786c9f749afeda569f51831d7888d922b3f9ad3429eeedceb7e1f1806e1855769', 'Bookstore Window 1 Staff', 'STAFF')
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`);
 
 -- Assign the cashier account to Cashier Window 3
