@@ -1,0 +1,32 @@
+name: Build Windows installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "installer-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build self-contained installers
+        shell: pwsh
+        run: .\installer\Build-Installers.ps1
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: Queue-Management-System-Windows-Installers
+          path: release/Installers/*.exe
+          if-no-files-found: error
+          retention-days: 30

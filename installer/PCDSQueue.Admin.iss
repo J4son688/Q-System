@@ -1,4 +1,4 @@
-#define MyAppName "PCDS Queue Admin"
+#define MyAppName "Queue Management System - Admin"
 #define MyAppVersion "1.0.3"
 #define MyAppPublisher "Polytechnic College of Davao del Sur"
 #define MyAppExeName "PCDSQueue.Admin.exe"
@@ -9,7 +9,7 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\PCDS Queue\Admin
-DefaultGroupName=PCDS Queue
+DefaultGroupName=Queue Management System
 OutputDir=..\release\Installers
 OutputBaseFilename=PCDS Queue Admin Setup
 SetupIconFile=..\desktop\PCDSQueue.Admin\PCDSQueue.Admin\Assets\pcds-queue.ico
@@ -30,11 +30,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts:"; Flags: unchecked
 
 [Files]
-Source: "..\release\PCDSQueue.Admin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\release\publish\Admin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\PCDS Queue Admin"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\PCDS Queue Admin"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\Queue Management System - Admin"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\Queue Management System - Admin"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch PCDS Queue Admin"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch Queue Management System - Admin"; Flags: nowait postinstall skipifsilent
