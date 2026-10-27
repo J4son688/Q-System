@@ -75,8 +75,7 @@ public partial class SettingsWindow : UserControl
                 QrExpirationHours = qrHours,
                 TvVoiceEnabled = TvVoiceCheckBox.IsChecked == true,
                 RefreshInterval = refreshInterval,
-                MobileQueueEnabled = MobileQueueCheckBox.IsChecked == true,
-                KioskQueueEnabled = KioskQueueCheckBox.IsChecked == true
+                MobileQueueEnabled = MobileQueueCheckBox.IsChecked == true
             };
 
             var response = await _settingsService.SaveSettingsAsync(settings);
@@ -104,7 +103,6 @@ public partial class SettingsWindow : UserControl
         TvVoiceCheckBox.IsChecked = settings.TvVoiceEnabled;
         RefreshIntervalTextBox.Text = settings.RefreshInterval.ToString();
         MobileQueueCheckBox.IsChecked = settings.MobileQueueEnabled;
-        KioskQueueCheckBox.IsChecked = settings.KioskQueueEnabled;
     }
 
     private void UpdateSystemStatus(string apiServer, string database)

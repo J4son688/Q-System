@@ -207,11 +207,11 @@ def create_kiosk_qr_session(department_id):
         if not department or not department["is_active"]:
             return jsonify({"message": "Department is not available."}), 404
 
-        kiosk_enabled = db.session.execute(
-            text("SELECT setting_value FROM system_settings WHERE setting_key = 'kiosk_queue_enabled'")
+        mobile_enabled = db.session.execute(
+            text("SELECT setting_value FROM system_settings WHERE setting_key = 'mobile_queue_enabled'")
         ).scalar()
-        if kiosk_enabled is not None and str(kiosk_enabled).strip().lower() not in {"true", "1", "yes", "on"}:
-            return jsonify({"message": "Kiosk queue entry is currently disabled."}), 403
+        if mobile_enabled is not None and str(mobile_enabled).strip().lower() not in {"true", "1", "yes", "on"}:
+            return jsonify({"message": "Online queue entry is currently disabled."}), 403
 
         expiration_setting = db.session.execute(
             text("SELECT setting_value FROM system_settings WHERE setting_key = 'qr_expiration_hours'")

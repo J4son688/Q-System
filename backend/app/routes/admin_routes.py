@@ -57,7 +57,7 @@ SYSTEM_SETTING_DESCRIPTIONS = {
     "automatic_reconnection": "Retry the mobile connection automatically",
     "offline_retry_interval_seconds": "Seconds between offline retry attempts",
     "refresh_interval": "TV display refresh interval in seconds",
-    "mobile_queue_enabled": "Allow queue entry from the mobile app",
+    "mobile_queue_enabled": "Allow customers to join using the phone web page",
     "kiosk_queue_enabled": "Allow queue entry from the kiosk"
 }
 

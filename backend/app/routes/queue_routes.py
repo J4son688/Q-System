@@ -416,18 +416,18 @@ def department_status(department_id):
         if not department:
             return jsonify({"message": "Department not found."}), 404
 
-        kiosk_setting = db.session.execute(
+        mobile_setting = db.session.execute(
             text("""
                 SELECT setting_value
                 FROM system_settings
-                WHERE setting_key = 'kiosk_queue_enabled'
+                WHERE setting_key = 'mobile_queue_enabled'
                 LIMIT 1
             """)
         ).scalar()
-        kiosk_queue_enabled = (
+        mobile_queue_enabled = (
             True
-            if kiosk_setting is None
-            else str(kiosk_setting).strip().lower() in {"true", "1", "yes", "on"}
+            if mobile_setting is None
+            else str(mobile_setting).strip().lower() in {"true", "1", "yes", "on"}
         )
 
         waiting_count = _waiting_count(department_id)
@@ -478,7 +478,7 @@ def department_status(department_id):
                 "queue_prefix": department["queue_prefix"],
                 "is_active": bool(department["is_active"]),
                 "queue_is_open": bool(department["queue_is_open"]),
-                "kiosk_queue_enabled": kiosk_queue_enabled
+                "mobile_queue_enabled": mobile_queue_enabled
             },
             "waiting_count": waiting_count,
             "active_window_count": int(active_window_count or 0),

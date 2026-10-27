@@ -46,8 +46,8 @@ INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VA
     ('qr_expiration_hours',          '24',                           'QR session lifetime in hours'),
     ('tv_voice_enabled',             'true',                         'Enable TV voice announcements'),
     ('refresh_interval',             '3',                            'Display refresh interval in seconds'),
-    ('mobile_queue_enabled',         'true',                         'Allow queue entry from the mobile app'),
-    ('kiosk_queue_enabled',          'true',                         'Allow queue entry from the kiosk'),
+    ('mobile_queue_enabled',         'true',                         'Allow customers to join using the phone web page'),
+    ('kiosk_queue_enabled',          'true',                         'Legacy paper-ticket queue setting'),
     ('mobile_notification_enabled',  'true',                         'Enable mobile queue notifications')
 ON DUPLICATE KEY UPDATE
     `setting_value` = VALUES(`setting_value`),

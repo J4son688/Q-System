@@ -19,10 +19,10 @@ public sealed class DepartmentModel
     [JsonPropertyName("queue_is_open")]
     public bool QueueIsOpen { get; init; }
 
-    [JsonPropertyName("kiosk_queue_enabled")]
-    public bool KioskQueueEnabled { get; init; } = true;
+    [JsonPropertyName("mobile_queue_enabled")]
+    public bool MobileQueueEnabled { get; init; } = true;
 
-    public bool IsAvailableForKiosk => QueueIsOpen && KioskQueueEnabled;
+    public bool IsAvailableForKiosk => QueueIsOpen && MobileQueueEnabled;
 }
 
 public sealed class DepartmentResponse

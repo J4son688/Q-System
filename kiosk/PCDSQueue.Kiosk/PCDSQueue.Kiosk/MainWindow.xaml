@@ -127,7 +127,7 @@
                                                    TextAlignment="Center" TextWrapping="Wrap"
                                                    Margin="0,17,0,0" FontSize="21" FontWeight="Bold"
                                                    Foreground="#172033" />
-                                        <TextBlock Text="Get queue number" HorizontalAlignment="Center"
+                                        <TextBlock Text="Join on your phone" HorizontalAlignment="Center"
                                                    Margin="0,6,0,0" FontSize="12" Foreground="#718096" />
                                         <TextBlock Text="QUEUE CLOSED" HorizontalAlignment="Center"
                                                    Margin="0,6,0,0" FontSize="11" FontWeight="SemiBold"
@@ -143,14 +143,14 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <TextBlock Text="KIOSK QUEUE UNAVAILABLE" HorizontalAlignment="Center"
+                                        <TextBlock Text="ONLINE QUEUE UNAVAILABLE" HorizontalAlignment="Center"
                                                    Margin="0,6,0,0" FontSize="11" FontWeight="SemiBold"
                                                    Foreground="#DC3545">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding KioskQueueEnabled}" Value="False">
+                                                        <DataTrigger Binding="{Binding MobileQueueEnabled}" Value="False">
                                                             <Setter Property="Visibility" Value="Visible" />
                                                         </DataTrigger>
                                                     </Style.Triggers>

@@ -27,9 +27,6 @@ public sealed class SystemSettingsModel
 
     [JsonPropertyName("mobile_queue_enabled")]
     public bool MobileQueueEnabled { get; set; } = true;
-
-    [JsonPropertyName("kiosk_queue_enabled")]
-    public bool KioskQueueEnabled { get; set; } = true;
 }
 
 public sealed class SystemInformationModel

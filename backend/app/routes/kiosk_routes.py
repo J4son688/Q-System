@@ -10,13 +10,13 @@ kiosk_bp = Blueprint("kiosk", __name__, url_prefix="/api/kiosk")
 @kiosk_bp.get("/departments")
 def get_departments():
     try:
-        kiosk_setting = db.session.execute(
-            text("SELECT setting_value FROM system_settings WHERE setting_key = 'kiosk_queue_enabled' LIMIT 1")
+        mobile_setting = db.session.execute(
+            text("SELECT setting_value FROM system_settings WHERE setting_key = 'mobile_queue_enabled' LIMIT 1")
         ).scalar()
-        kiosk_queue_enabled = (
+        mobile_queue_enabled = (
             True
-            if kiosk_setting is None
-            else str(kiosk_setting).strip().lower() in {"true", "1", "yes", "on"}
+            if mobile_setting is None
+            else str(mobile_setting).strip().lower() in {"true", "1", "yes", "on"}
         )
         rows = db.session.execute(
             text("""
@@ -35,7 +35,7 @@ def get_departments():
                     "queue_prefix": row["queue_prefix"],
                     "status": "ACTIVE" if row["is_active"] else "INACTIVE",
                     "queue_is_open": bool(row["queue_is_open"]),
-                    "kiosk_queue_enabled": kiosk_queue_enabled
+                    "mobile_queue_enabled": mobile_queue_enabled
                 }
                 for row in rows
             ]
