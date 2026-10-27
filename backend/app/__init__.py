@@ -22,12 +22,14 @@ def create_app():
 
     from app.routes.auth_routes import auth_bp
     from app.routes.admin_routes import admin_bp
+    from app.routes.customer_web_routes import customer_web_bp
     from app.routes.kiosk_routes import kiosk_bp
     from app.routes.queue_routes import queue_bp
     from app.routes.qr_routes import qr_bp
     from app.routes.staff_routes import staff_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(customer_web_bp)
     app.register_blueprint(kiosk_bp)
     app.register_blueprint(queue_bp)
     app.register_blueprint(qr_bp)

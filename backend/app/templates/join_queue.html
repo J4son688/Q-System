@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#077f8d">
+  <meta name="referrer" content="no-referrer">
+  <title>Join Queue | Queue Management System</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #172033;
+      background: #f5f7fb;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px;
+      display: grid;
+      place-items: center;
+    }
+
+    main {
+      width: min(100%, 460px);
+      padding: clamp(24px, 7vw, 40px);
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 16px 48px rgba(6, 106, 118, 0.08);
+      text-align: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 0 28px;
+      color: #172033;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 9px;
+      background: #077f8d;
+      color: #fff;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    h1 { margin: 0; font-size: clamp(25px, 7vw, 34px); }
+    p { color: #52657a; line-height: 1.55; }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #718096;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 16px;
+      border: 0;
+      border-radius: 10px;
+      background: #077f8d;
+      color: #fff;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled { cursor: wait; opacity: 0.65; }
+
+    .number {
+      margin: 22px 0;
+      color: #066a76;
+      font-size: clamp(56px, 18vw, 76px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .message { margin-top: 18px; font-size: 14px; }
+    .error { color: #b42332; }
+    .status { color: #066a76; font-weight: 700; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">Q</span>
+      <span>QUEUE MANAGEMENT SYSTEM</span>
+    </div>
+
+    <section id="loading" role="status" aria-live="polite">
+      <h1>Loading queue</h1>
+      <p>Checking this service QR code…</p>
+    </section>
+
+    <section id="joinSection" hidden>
+      <p class="eyebrow">Join a service queue</p>
+      <h1 id="departmentName"></h1>
+      <p>Your queue number will appear here on your phone. No paper ticket is needed.</p>
+      <button id="joinButton" type="button">JOIN QUEUE</button>
+      <p id="joinMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="ticketSection" hidden aria-live="polite">
+      <p class="eyebrow">Your queue number</p>
+      <h1 id="ticketDepartment"></h1>
+      <div id="queueNumber" class="number"></div>
+      <p id="queueState" class="status"></p>
+      <p id="ticketMessage" class="message" role="status" aria-live="polite">
+        Keep this page open for queue updates.
+      </p>
+    </section>
+
+    <p id="errorMessage" class="message error" role="alert" hidden></p>
+  </main>
+
+  <script>
+    const qrToken = new URLSearchParams(window.location.hash.slice(1)).get("token");
+    const loadingSection = document.getElementById("loading");
+    const joinSection = document.getElementById("joinSection");
+    const ticketSection = document.getElementById("ticketSection");
+    const joinButton = document.getElementById("joinButton");
+    const errorMessage = document.getElementById("errorMessage");
+    const joinMessage = document.getElementById("joinMessage");
+    const ticketMessage = document.getElementById("ticketMessage");
+    let department = null;
+    let queuePollTimer = null;
+
+    function showError(message) {
+      loadingSection.hidden = true;
+      joinMessage.textContent = "";
+      errorMessage.textContent = message;
+      errorMessage.hidden = false;
+    }
+
+    async function requestJson(path, options) {
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(options && options.headers),
+        },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const error = new Error(
+          typeof payload.message === "string"
+            ? payload.message
+            : "The queue server could not complete the request.",
+        );
+        error.status = response.status;
+        error.payload = payload;
+        throw error;
+      }
+      return payload;
+    }
+
+    function deviceIdentifier() {
+      const key = "queue.webDeviceIdentifier";
+      let identifier = localStorage.getItem(key);
+      if (!identifier) {
+        if (!window.crypto || !window.crypto.randomUUID) {
+          throw new Error("Please open this page in an up-to-date browser to join the queue.");
+        }
+        identifier = window.crypto.randomUUID();
+        localStorage.setItem(key, identifier);
+      }
+      return identifier;
+    }
+
+    function ticketStorageKey() {
+      return `queue.webTicket.${department.department_id}`;
+    }
+
+    function showJoin() {
+      loadingSection.hidden = true;
+      joinSection.hidden = false;
+    }
+
+    function formatQueueStatus(status) {
+      const labels = {
+        WAITING: "You are in the queue",
+        CALLED: "Your number is being called",
+        SERVING: "Please proceed to the service window",
+        COMPLETED: "Service completed",
+        CANCELLED: "This queue entry was cancelled",
+        NO_SHOW: "This queue entry was marked as no-show",
+      };
+      return labels[status] || status.replaceAll("_", " ");
+    }
+
+    function displayTicket(ticket) {
+      loadingSection.hidden = true;
+      joinSection.hidden = true;
+      errorMessage.hidden = true;
+      ticketSection.hidden = false;
+      document.getElementById("ticketDepartment").textContent = department.department_name;
+      document.getElementById("queueNumber").textContent = ticket.queue_number;
+      document.getElementById("queueState").textContent = formatQueueStatus(ticket.status);
+    }
+
+    async function refreshTicket(queueId) {
+      try {
+        const status = await requestJson(`/api/queue/${queueId}/status`);
+        displayTicket(status);
+        if (["COMPLETED", "CANCELLED", "NO_SHOW"].includes(status.status)) {
+          localStorage.removeItem(ticketStorageKey());
+          ticketMessage.textContent = "This ticket is no longer active.";
+          if (queuePollTimer) window.clearInterval(queuePollTimer);
+          return;
+        }
+        ticketMessage.textContent = status.window_name
+          ? `Please watch for ${status.queue_number} at ${status.window_name}.`
+          : "Keep this page open for queue updates.";
+      } catch {
+        ticketMessage.textContent = "Live updates are temporarily unavailable. Your number is saved on this browser.";
+      }
+    }
+
+    async function showExistingTicketIfAvailable() {
+      const savedQueueId = Number(localStorage.getItem(ticketStorageKey()));
+      if (!Number.isSafeInteger(savedQueueId) || savedQueueId <= 0) return false;
+      try {
+        const status = await requestJson(`/api/queue/${savedQueueId}/status`);
+        if (["WAITING", "CALLED", "SERVING"].includes(status.status)) {
+          displayTicket(status);
+          queuePollTimer = window.setInterval(
+            () => void refreshTicket(savedQueueId),
+            5000,
+          );
+          return true;
+        }
+        localStorage.removeItem(ticketStorageKey());
+      } catch (error) {
+        if (error.status === 404) {
+          localStorage.removeItem(ticketStorageKey());
+          return false;
+        }
+        throw error;
+      }
+      return false;
+    }
+
+    async function joinQueue() {
+      joinButton.disabled = true;
+      joinMessage.textContent = "Joining the queue…";
+      errorMessage.hidden = true;
+      try {
+        const payload = await requestJson("/api/queue/generate", {
+          method: "POST",
+          body: JSON.stringify({
+            department_id: department.department_id,
+            source: "MOBILE",
+            device_identifier: deviceIdentifier(),
+            qr_token: qrToken,
+          }),
+        });
+        const ticket = payload.queue;
+        localStorage.setItem(ticketStorageKey(), String(ticket.queue_id));
+        displayTicket(ticket);
+        queuePollTimer = window.setInterval(
+          () => void refreshTicket(ticket.queue_id),
+          5000,
+        );
+        void refreshTicket(ticket.queue_id);
+      } catch (error) {
+        if (error.status === 409 && error.payload?.queue?.queue_id) {
+          const existingTicket = error.payload.queue;
+          localStorage.setItem(ticketStorageKey(), String(existingTicket.queue_id));
+          displayTicket(existingTicket);
+          await refreshTicket(existingTicket.queue_id);
+          queuePollTimer = window.setInterval(
+            () => void refreshTicket(existingTicket.queue_id),
+            5000,
+          );
+          return;
+        }
+        joinButton.disabled = false;
+        joinMessage.textContent = "";
+        errorMessage.textContent = error.message || "Unable to join the queue. Please try again.";
+        errorMessage.hidden = false;
+      }
+    }
+
+    async function initialize() {
+      if (!qrToken) {
+        showError("This link is missing its queue code. Please scan the QR code at the kiosk.");
+        return;
+      }
+      try {
+        const result = await requestJson(
+          `/api/qr/validate/${encodeURIComponent(qrToken)}`,
+        );
+        if (!result.valid) {
+          showError(result.message || "This queue code is not valid. Please scan a current kiosk QR code.");
+          return;
+        }
+        department = result.department;
+        document.getElementById("departmentName").textContent =
+          department.department_name;
+        if (!department.queue_is_open || !result.mobile_queue_enabled) {
+          showJoin();
+          joinButton.disabled = true;
+          joinMessage.textContent = !department.queue_is_open
+            ? "This queue is currently closed."
+            : "Online queue joining is currently unavailable.";
+          return;
+        }
+        if (await showExistingTicketIfAvailable()) return;
+        showJoin();
+      } catch (error) {
+        showError(
+          error.message || "Unable to load this queue. Check your connection and scan the kiosk QR code again.",
+        );
+      }
+    }
+
+    joinButton.addEventListener("click", () => void joinQueue());
+    window.addEventListener("pagehide", () => {
+      if (queuePollTimer) window.clearInterval(queuePollTimer);
+    });
+    void initialize();
+  </script>
+</body>
+</html>

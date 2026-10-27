@@ -78,7 +78,10 @@ public partial class DepartmentQueueWindow : Window
         {
             var session = await _departmentQueueService.CreateQrSessionAsync(_department.DepartmentId);
             _qrSessionToken = session.Token;
-            QrImage.Source = CreateQrImage(session.Token);
+            var joinUrl = new Uri(
+                ApiService.Client.BaseAddress!,
+                $"join#token={Uri.EscapeDataString(session.Token)}");
+            QrImage.Source = CreateQrImage(joinUrl.AbsoluteUri);
             QrLoadingText.Visibility = Visibility.Collapsed;
             ErrorText.Visibility = Visibility.Collapsed;
         }
@@ -105,8 +108,8 @@ public partial class DepartmentQueueWindow : Window
                 ? "Kiosk queue unavailable"
                 : _queueOpen ? "Queue is open" : "Queue is currently closed";
             PrintTicketButton.Content = _pendingTicket is not null
-                ? "RETRY PRINT"
-                : _kioskQueueEnabled ? "PRINT TICKET" : "KIOSK QUEUE UNAVAILABLE";
+                ? "RETRY PAPER TICKET"
+                : _kioskQueueEnabled ? "GET PAPER TICKET INSTEAD" : "PAPER TICKET UNAVAILABLE";
             PrintTicketButton.IsEnabled = _pendingTicket is not null
                 || (_kioskQueueEnabled && _queueOpen && !_isGeneratingTicket && IsServerOnline());
             ErrorText.Visibility = Visibility.Collapsed;
@@ -184,7 +187,7 @@ public partial class DepartmentQueueWindow : Window
             {
                 var message =
                     $"Queue number {_pendingTicket.QueueNumber} was created, but the ticket could not be printed. " +
-                    "Check the thermal printer, then press RETRY PRINT.";
+                    "Check the thermal printer, then press RETRY PAPER TICKET.";
                 QueueStateText.Text = "Ticket generated, but not printed";
                 ShowError(message);
                 MessageBox.Show(
@@ -218,8 +221,8 @@ public partial class DepartmentQueueWindow : Window
             if (IsVisible)
             {
                 PrintTicketButton.Content = _pendingTicket is not null
-                    ? "RETRY PRINT"
-                    : _kioskQueueEnabled ? "PRINT TICKET" : "KIOSK QUEUE UNAVAILABLE";
+                    ? "RETRY PAPER TICKET"
+                    : _kioskQueueEnabled ? "GET PAPER TICKET INSTEAD" : "PAPER TICKET UNAVAILABLE";
                 PrintTicketButton.IsEnabled = _pendingTicket is not null
                     || (_kioskQueueEnabled && IsServerOnline() && _queueOpen);
             }
@@ -247,10 +250,10 @@ public partial class DepartmentQueueWindow : Window
         Close();
     }
 
-    private static BitmapImage CreateQrImage(string token)
+    private static BitmapImage CreateQrImage(string payload)
     {
         using var generator = new QRCodeGenerator();
-        using var data = generator.CreateQrCode(token, QRCodeGenerator.ECCLevel.Q);
+        using var data = generator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
         var pngBytes = new PngByteQRCode(data).GetGraphic(10);
         using var stream = new MemoryStream(pngBytes);
         var image = new BitmapImage();
