@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, current_app, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -48,6 +48,7 @@ def create_app():
             db.session.execute(text("SELECT 1"))
         except Exception:
             db.session.rollback()
+            current_app.logger.exception("Database health check failed.")
             return jsonify({
                 "status": "offline",
                 "service": "PCDS Queue API",
