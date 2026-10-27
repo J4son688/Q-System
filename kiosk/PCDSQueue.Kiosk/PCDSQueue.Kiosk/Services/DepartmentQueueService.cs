@@ -21,11 +21,6 @@ public sealed class DepartmentQueueService
             $"api/queue/status/{departmentId}",
             HttpMethod.Get);
 
-    public Task<KioskQrSessionStatusResponse> GetQrSessionStatusAsync(string token) =>
-        SendAsync<KioskQrSessionStatusResponse>(
-            $"api/kiosk/qr-session/{Uri.EscapeDataString(token)}/status",
-            HttpMethod.Get);
-
     private static async Task<T> SendAsync<T>(string path, HttpMethod method)
     {
         try

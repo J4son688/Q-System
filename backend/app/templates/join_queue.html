@@ -87,6 +87,12 @@
 
     button:disabled { cursor: wait; opacity: 0.65; }
 
+    .leave-button {
+      border: 1px solid #b42332;
+      background: #fff;
+      color: #b42332;
+    }
+
     .number {
       margin: 22px 0;
       color: #066a76;
@@ -113,22 +119,20 @@
       <p>Checking this service QR code…</p>
     </section>
 
-    <section id="joinSection" hidden>
-      <p class="eyebrow">Join a service queue</p>
-      <h1 id="departmentName"></h1>
-      <p>Your queue number will appear here on your phone. No paper ticket is needed.</p>
-      <button id="joinButton" type="button">JOIN QUEUE</button>
-      <p id="joinMessage" class="message" role="status" aria-live="polite"></p>
-    </section>
-
     <section id="ticketSection" hidden aria-live="polite">
       <p class="eyebrow">Your queue number</p>
       <h1 id="ticketDepartment"></h1>
       <div id="queueNumber" class="number"></div>
       <p id="queueState" class="status"></p>
+      <button id="leaveButton" class="leave-button" type="button" hidden>LEAVE QUEUE</button>
+      <button id="joinAgainButton" type="button" hidden>JOIN THIS QUEUE AGAIN</button>
       <p id="ticketMessage" class="message" role="status" aria-live="polite">
         Keep this page open for queue updates.
       </p>
+    </section>
+
+    <section id="retrySection" hidden>
+      <button id="retryButton" type="button">TRY AGAIN</button>
     </section>
 
     <p id="errorMessage" class="message error" role="alert" hidden></p>
@@ -137,18 +141,20 @@
   <script>
     const qrToken = new URLSearchParams(window.location.hash.slice(1)).get("token");
     const loadingSection = document.getElementById("loading");
-    const joinSection = document.getElementById("joinSection");
     const ticketSection = document.getElementById("ticketSection");
-    const joinButton = document.getElementById("joinButton");
+    const retrySection = document.getElementById("retrySection");
+    const retryButton = document.getElementById("retryButton");
+    const leaveButton = document.getElementById("leaveButton");
+    const joinAgainButton = document.getElementById("joinAgainButton");
     const errorMessage = document.getElementById("errorMessage");
-    const joinMessage = document.getElementById("joinMessage");
     const ticketMessage = document.getElementById("ticketMessage");
     let department = null;
+    let activeQueueId = null;
     let queuePollTimer = null;
 
     function showError(message) {
       loadingSection.hidden = true;
-      joinMessage.textContent = "";
+      retrySection.hidden = false;
       errorMessage.textContent = message;
       errorMessage.hidden = false;
     }
@@ -193,11 +199,6 @@
       return `queue.webTicket.${department.department_id}`;
     }
 
-    function showJoin() {
-      loadingSection.hidden = true;
-      joinSection.hidden = false;
-    }
-
     function formatQueueStatus(status) {
       const labels = {
         WAITING: "You are in the queue",
@@ -212,12 +213,16 @@
 
     function displayTicket(ticket) {
       loadingSection.hidden = true;
-      joinSection.hidden = true;
+      retrySection.hidden = true;
       errorMessage.hidden = true;
       ticketSection.hidden = false;
       document.getElementById("ticketDepartment").textContent = department.department_name;
       document.getElementById("queueNumber").textContent = ticket.queue_number;
       document.getElementById("queueState").textContent = formatQueueStatus(ticket.status);
+      activeQueueId = ticket.queue_id;
+      leaveButton.hidden = ticket.status !== "WAITING";
+      leaveButton.disabled = false;
+      joinAgainButton.hidden = ticket.status !== "CANCELLED";
     }
 
     async function refreshTicket(queueId) {
@@ -225,8 +230,10 @@
         const status = await requestJson(`/api/queue/${queueId}/status`);
         displayTicket(status);
         if (["COMPLETED", "CANCELLED", "NO_SHOW"].includes(status.status)) {
-          localStorage.removeItem(ticketStorageKey());
-          ticketMessage.textContent = "This ticket is no longer active.";
+          leaveButton.hidden = true;
+          ticketMessage.textContent = status.status === "CANCELLED"
+            ? "You left this queue."
+            : "This ticket is no longer active.";
           if (queuePollTimer) window.clearInterval(queuePollTimer);
           return;
         }
@@ -251,6 +258,13 @@
           );
           return true;
         }
+        if (["COMPLETED", "CANCELLED", "NO_SHOW"].includes(status.status)) {
+          displayTicket(status);
+          ticketMessage.textContent = status.status === "CANCELLED"
+            ? "You left this queue."
+            : "This ticket is no longer active.";
+          return true;
+        }
         localStorage.removeItem(ticketStorageKey());
       } catch (error) {
         if (error.status === 404) {
@@ -263,8 +277,11 @@
     }
 
     async function joinQueue() {
-      joinButton.disabled = true;
-      joinMessage.textContent = "Joining the queue…";
+      loadingSection.hidden = false;
+      ticketSection.hidden = true;
+      retrySection.hidden = true;
+      document.querySelector("#loading h1").textContent = "Joining queue";
+      document.querySelector("#loading p").textContent = "Creating your ticket…";
       errorMessage.hidden = true;
       try {
         const payload = await requestJson("/api/queue/generate", {
@@ -296,10 +313,34 @@
           );
           return;
         }
-        joinButton.disabled = false;
-        joinMessage.textContent = "";
+        loadingSection.hidden = true;
         errorMessage.textContent = error.message || "Unable to join the queue. Please try again.";
         errorMessage.hidden = false;
+        retrySection.hidden = false;
+      }
+    }
+
+    async function leaveQueue() {
+      if (!activeQueueId || !window.confirm("Leave this queue? Your ticket will be cancelled.")) {
+        return;
+      }
+
+      leaveButton.disabled = true;
+      ticketMessage.textContent = "Leaving queue…";
+      try {
+        await requestJson(`/api/queue/${activeQueueId}/cancel`, {
+          method: "POST",
+          body: JSON.stringify({ device_identifier: deviceIdentifier() }),
+        });
+        if (queuePollTimer) window.clearInterval(queuePollTimer);
+        queuePollTimer = null;
+        await refreshTicket(activeQueueId);
+      } catch (error) {
+        ticketMessage.textContent = error.message || "Unable to leave the queue. Please try again.";
+        leaveButton.disabled = false;
+        if (error.status === 409) {
+          void refreshTicket(activeQueueId);
+        }
       }
     }
 
@@ -317,18 +358,16 @@
           return;
         }
         department = result.department;
-        document.getElementById("departmentName").textContent =
-          department.department_name;
         if (!department.queue_is_open || !result.mobile_queue_enabled) {
-          showJoin();
-          joinButton.disabled = true;
-          joinMessage.textContent = !department.queue_is_open
+          loadingSection.hidden = true;
+          showError(!department.queue_is_open
             ? "This queue is currently closed."
-            : "Online queue joining is currently unavailable.";
+            : "Online queue joining is currently unavailable.");
+          retrySection.hidden = true;
           return;
         }
         if (await showExistingTicketIfAvailable()) return;
-        showJoin();
+        await joinQueue();
       } catch (error) {
         showError(
           error.message || "Unable to load this queue. Check your connection and scan the kiosk QR code again.",
@@ -336,7 +375,9 @@
       }
     }
 
-    joinButton.addEventListener("click", () => void joinQueue());
+    leaveButton.addEventListener("click", () => void leaveQueue());
+    joinAgainButton.addEventListener("click", () => void joinQueue());
+    retryButton.addEventListener("click", () => void initialize());
     window.addEventListener("pagehide", () => {
       if (queuePollTimer) window.clearInterval(queuePollTimer);
     });

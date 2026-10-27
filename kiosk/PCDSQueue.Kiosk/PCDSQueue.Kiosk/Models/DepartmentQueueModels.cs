@@ -25,9 +25,3 @@ public sealed class DepartmentQueueStatusResponse
     [JsonPropertyName("waiting_count")]
     public int WaitingCount { get; init; }
 }
-
-public sealed class KioskQrSessionStatusResponse
-{
-    [JsonPropertyName("scanned")]
-    public bool Scanned { get; init; }
-}

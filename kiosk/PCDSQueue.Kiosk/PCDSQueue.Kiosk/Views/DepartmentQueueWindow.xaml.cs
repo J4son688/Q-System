@@ -22,11 +22,9 @@ public partial class DepartmentQueueWindow : Window
         Interval = TimeSpan.FromSeconds(3)
     };
     private bool _refreshing;
-    private bool _checkingQrSession;
     private bool _isGeneratingTicket;
     private bool _queueOpen;
     private bool _kioskQueueEnabled = true;
-    private string? _qrSessionToken;
     private QueueTicketModel? _pendingTicket;
 
     public DepartmentQueueWindow(DepartmentModel department)
@@ -77,7 +75,6 @@ public partial class DepartmentQueueWindow : Window
         try
         {
             var session = await _departmentQueueService.CreateQrSessionAsync(_department.DepartmentId);
-            _qrSessionToken = session.Token;
             var joinUrl = new Uri(
                 ApiService.Client.BaseAddress!,
                 $"join#token={Uri.EscapeDataString(session.Token)}");
@@ -135,34 +132,6 @@ public partial class DepartmentQueueWindow : Window
             if (QrImage.Source is null)
                 await LoadQrAsync();
             await RefreshQueueStatusAsync();
-
-            if (_pendingTicket is null && await IsQrSessionScannedAsync())
-            {
-                ReturnToHome();
-                return;
-            }
-        }
-    }
-
-    private async Task<bool> IsQrSessionScannedAsync()
-    {
-        if (_checkingQrSession || string.IsNullOrWhiteSpace(_qrSessionToken))
-            return false;
-
-        _checkingQrSession = true;
-        try
-        {
-            var status = await _departmentQueueService.GetQrSessionStatusAsync(_qrSessionToken);
-            return status.Scanned;
-        }
-        catch (Exception ex)
-        {
-            ShowError(ex.Message);
-            return false;
-        }
-        finally
-        {
-            _checkingQrSession = false;
         }
     }
 
